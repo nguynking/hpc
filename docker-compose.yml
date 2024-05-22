@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.api
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "7860:7860"
+    depends_on:
+      - api
+
