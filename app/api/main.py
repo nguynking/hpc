@@ -1,15 +1,13 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-import random
+from transformers import pipeline
 
-app = FastAPI()
+app = FastAPI(title="Extractive Question-Answering API", description="API to answer a question using provided context")
 
-class TextRequest(BaseModel):
-    text: str
+# Load the model using Hugging Face's pipeline
+model_name = "quocviethere/xlmroberta-finetuned-squadv2"
+qa_pipeline = pipeline('question-answering', model=model_name)
 
-@app.post("/classify/")
-def classify_text(request: TextRequest):
-    classes = ['Positive', 'Negative', 'Neutral']
-    classification = random.choice(classes)
-    return {"classification": classification}
-
+@app.post("/answer", summary="Answer a new question give context")
+def answer_question(context: str, question: str) -> dict:
+    answer = qa_pipeline(context=context, question=question)['answer']
+    return {"answer": answer}
