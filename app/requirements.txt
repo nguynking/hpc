@@ -4,3 +4,5 @@ gradio
 requests
 transformers
 torch
+sqlalchemy
+sqlite

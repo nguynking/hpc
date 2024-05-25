@@ -16,4 +16,3 @@ services:
       - "7860:7860"
     depends_on:
       - api
-
