@@ -4,4 +4,4 @@ gradio
 requests
 transformers
 torch
-sqlalchemy
+SQLAlchemy
