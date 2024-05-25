@@ -7,7 +7,7 @@ import requests
 
 # Define a function that the interface will use
 def answer_question(context, question):
-    response = requests.post("http://api:8000/answer/", json={"context": context, "question": question})
+    response = requests.post("http://api:8000/answer", json={"context": context, "question": question})
     return response.json()['answer']
 
 # iface = gr.Interface(
@@ -36,4 +36,3 @@ iface = gr.Interface(fn=answer_question,
                      examples=examples)
 
 iface.launch(server_name="0.0.0.0", server_port=7860)
-
