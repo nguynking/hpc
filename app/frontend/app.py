@@ -18,6 +18,12 @@ def answer_question(context, question):
 #     description="Classify text as Positive, Negative, or Neutral"
 # )
 
+# Define a single example
+examples = [
+    ["Tính đến tháng 6/2023, Vườn ươm Viện Đổi mới sáng tạo đã ươm tạo gần 100 dự án khởi nghiệp, trong đó có 19 dự án thành lập công ty, hơn 7600 người tham dự các hoạt động và tổng giá trị đầu tư mạo hiểm đạt 350.000 USD.", 
+     "Tổng giá trị đầu tư mạo hiểm của Vườn ươm Viện Đổi mới sáng tạo là bao nhiêu?"]
+]
+
 # Create the Gradio interface
 iface = gr.Interface(fn=answer_question,
                      inputs=[

@@ -3,3 +3,4 @@ uvicorn
 gradio
 requests
 transformers
+torch
