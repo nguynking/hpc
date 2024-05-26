@@ -22,13 +22,18 @@ examples = [
      "Tổng giá trị đầu tư mạo hiểm của Vườn ươm Viện Đổi mới sáng tạo là bao nhiêu?"]
 ]
 
-with gr.Blocks(css=".container { max-width: 800px; margin: auto; padding: 20px; font-family: Arial, sans-serif; } \
-                    .chat-box { border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 20px; } \
-                    .chat-input { margin-top: 10px; margin-bottom: 20px; } \
-                    .chat-message { padding: 10px; border-bottom: 1px solid #eee; } \
-                    .chat-message:last-child { border-bottom: none; } \
-                    .chat-question { font-weight: bold; } \
-                    .chat-answer { margin-top: 5px; }") as demo:
+with gr.Blocks() as demo:
+    gr.HTML("""
+    <style>
+    .container { max-width: 800px; margin: auto; padding: 20px; font-family: Arial, sans-serif; }
+    .chat-box { border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 20px; }
+    .chat-input { margin-top: 10px; margin-bottom: 20px; }
+    .chat-message { padding: 10px; border-bottom: 1px solid #eee; }
+    .chat-message:last-child { border-bottom: none; }
+    .chat-question { font-weight: bold; }
+    .chat-answer { margin-top: 5px; }
+    </style>
+    """)
     
     gr.Markdown("""
     <div class="container">
@@ -37,11 +42,11 @@ with gr.Blocks(css=".container { max-width: 800px; margin: auto; padding: 20px; 
     </div>
     """)
     
-    chat_box = gr.Markdown(elem_id="chat-box", css=".chat-box")
+    chat_box = gr.Markdown(elem_id="chat-box")
     
-    context_input = gr.Textbox(lines=5, placeholder="Enter the context here...", label="Context", css=".chat-input")
-    question_input = gr.Textbox(placeholder="Enter your question here...", label="Question", css=".chat-input")
-    submit_button = gr.Button("Send", css=".chat-input")
+    context_input = gr.Textbox(lines=5, placeholder="Enter the context here...", label="Context", elem_id="context")
+    question_input = gr.Textbox(placeholder="Enter your question here...", label="Question", elem_id="question")
+    submit_button = gr.Button("Send", elem_id="get-answer")
 
     def update_chat(context, question):
         answer = answer_question(context, question)
@@ -58,8 +63,7 @@ with gr.Blocks(css=".container { max-width: 800px; margin: auto; padding: 20px; 
     gr.Examples(
         examples=examples,
         inputs=[context_input, question_input],
-        elem_id="examples",
-        css=".chat-input"
+        elem_id="examples"
     )
 
 demo.launch(server_name="0.0.0.0", server_port=7860)
