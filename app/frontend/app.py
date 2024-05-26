@@ -11,7 +11,6 @@ def answer_question(context, question):
 def get_history():
     response = requests.get("http://api:8000/history")
     history = response.json()
-    # Ensure the data is in the correct format for Gradio Dataframe component
     formatted_history = [
         (entry['id'], entry['context'], entry['question'], entry['answer'])
         for entry in history
@@ -23,23 +22,44 @@ examples = [
      "Tổng giá trị đầu tư mạo hiểm của Vườn ươm Viện Đổi mới sáng tạo là bao nhiêu?"]
 ]
 
-with gr.Blocks() as demo:
-    with gr.Row():
-        with gr.Column():
-            context = gr.Textbox(lines=7, placeholder="Enter the context here...", label="Context")
-            question = gr.Textbox(placeholder="Enter your question here...", label="Question")
-            answer = gr.Textbox(label="Answer")
-            btn = gr.Button("Get Answer")
-            btn.click(fn=answer_question, inputs=[context, question], outputs=answer)
-            
-        with gr.Column():
-            chat_history = gr.Dataframe(headers=["ID", "Context", "Question", "Answer"], label="Chat History")
-            btn_history = gr.Button("Load History")
-            btn_history.click(fn=get_history, inputs=[], outputs=chat_history)
+with gr.Blocks(css=".container { max-width: 800px; margin: auto; padding: 20px; font-family: Arial, sans-serif; } \
+                    .chat-box { border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 20px; } \
+                    .chat-input { margin-top: 10px; margin-bottom: 20px; } \
+                    .chat-message { padding: 10px; border-bottom: 1px solid #eee; } \
+                    .chat-message:last-child { border-bottom: none; } \
+                    .chat-question { font-weight: bold; } \
+                    .chat-answer { margin-top: 5px; }") as demo:
+    
+    gr.Markdown("""
+    <div class="container">
+        <h1>Question Answering Chat</h1>
+        <p>Enter your question and context to get answers using our advanced model.</p>
+    </div>
+    """)
+    
+    chat_box = gr.Markdown(elem_id="chat-box", css=".chat-box")
+    
+    context_input = gr.Textbox(lines=5, placeholder="Enter the context here...", label="Context", css=".chat-input")
+    question_input = gr.Textbox(placeholder="Enter your question here...", label="Question", css=".chat-input")
+    submit_button = gr.Button("Send", css=".chat-input")
 
+    def update_chat(context, question):
+        answer = answer_question(context, question)
+        chat_history = f"""
+        <div class="chat-message">
+            <div class="chat-question">Q: {question}</div>
+            <div class="chat-answer">A: {answer}</div>
+        </div>
+        """
+        return gr.Markdown.update(value=chat_history, append=True)
+    
+    submit_button.click(fn=update_chat, inputs=[context_input, question_input], outputs=chat_box)
+    
     gr.Examples(
         examples=examples,
-        inputs=[context, question]
+        inputs=[context_input, question_input],
+        elem_id="examples",
+        css=".chat-input"
     )
 
 demo.launch(server_name="0.0.0.0", server_port=7860)
