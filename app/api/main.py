@@ -21,7 +21,7 @@ def get_db():
         db.close()
 
 @app.post("/answer", summary="Answer a new question given context")
-async def answer_question(request: QARequest, db: Session = Depends(get_db)) -> dict:
+def answer_question(request: QARequest, db: Session = Depends(get_db)) -> dict:
     answer = qa_pipeline(context=request.context, question=request.question)['answer']
     chat = ChatHistory(context=request.context, question=request.question, answer=answer)
     db.add(chat)
@@ -30,6 +30,6 @@ async def answer_question(request: QARequest, db: Session = Depends(get_db)) -> 
     return {"answer": answer}
 
 @app.get("/history", summary="Get chat history")
-async def get_history(db: Session = Depends(get_db)):
+def get_history(db: Session = Depends(get_db)):
     history = db.query(ChatHistory).all()
     return history

@@ -1,7 +1,5 @@
 fastapi
 uvicorn
-gradio
-requests
 transformers
 torch
 SQLAlchemy

@@ -1,3 +1,4 @@
+import time
 import gradio as gr
 import requests
 
@@ -8,19 +9,40 @@ def answer_question(context, question):
     )
     return response.json().get('answer', 'No answer returned')
 
-def get_history():
-    response = requests.get("http://api:8000/history")
-    history = response.json()
-    formatted_history = [
-        (entry['id'], entry['context'], entry['question'], entry['answer'])
-        for entry in history
-    ]
+def get_history(retries=5, delay=2):
+    for i in range(retries):
+        try:
+            response = requests.get("http://api:8000/history")
+            history = response.json()
+            formatted_history = [
+                (entry['id'], entry['context'], entry['question'], entry['answer'])
+                for entry in history
+            ]
+            return formatted_history
+        except requests.exceptions.ConnectionError:
+            if i < retries - 1:
+                time.sleep(delay)
+                continue
+            else:
+                return []
+
+def update_chat(context, question):
+    answer = answer_question(context, question)
+    history = get_history()
+    formatted_history = ""
+    for entry in history:
+        formatted_history += f"""
+        <div class="chat-message">
+            <div class="chat-question">Q: {entry[2]}</div>
+            <div class="chat-answer">A: {entry[3]}</div>
+        </div>
+        """
     return formatted_history
 
 examples = [
     ["Tính đến tháng 6/2023, Vườn ươm Viện Đổi mới sáng tạo đã ươm tạo gần 100 dự án khởi nghiệp, trong đó có 19 dự án thành lập công ty, hơn 7600 người tham dự các hoạt động và tổng giá trị đầu tư mạo hiểm đạt 350.000 USD.", 
      "Tổng giá trị đầu tư mạo hiểm của Vườn ươm Viện Đổi mới sáng tạo là bao nhiêu?"],
-     ["""Vị trí của UEH trên các Bảng xếp hạng trong nước và quốc tế:
+    ["""Vị trí của UEH trên các Bảng xếp hạng trong nước và quốc tế:
 
 Top 860 Đại học thế giới về Bền vững theo QS World University Ranking Sustainability 2024;
 
@@ -142,18 +164,23 @@ with gr.Blocks() as demo:
     question_input = gr.Textbox(placeholder="Enter your question here...", label="Question", elem_id="question")
     submit_button = gr.Button("Send", elem_id="get-answer")
 
-    def update_chat(context, question, current_chat):
-        answer = answer_question(context, question)
-        new_message = f"""
+    # Load initial chat history when the interface loads
+    initial_history = get_history()
+    initial_chat = ""
+    for entry in initial_history:
+        initial_chat += f"""
         <div class="chat-message">
-            <div class="chat-question">Q: {question}</div>
-            <div class="chat-answer">A: {answer}</div>
+            <div class="chat-question">Q: {entry[2]}</div>
+            <div class="chat-answer">A: {entry[3]}</div>
         </div>
         """
-        updated_chat = current_chat + new_message
-        return updated_chat
     
-    submit_button.click(fn=update_chat, inputs=[context_input, question_input, chat_box], outputs=chat_box)
+    if not initial_chat:
+        initial_chat = "<div class='chat-message'><div class='chat-question'>No chat history available.</div></div>"
+
+    chat_box.value = initial_chat
+
+    submit_button.click(fn=update_chat, inputs=[context_input, question_input], outputs=chat_box)
     
     gr.Examples(
         examples=examples,
