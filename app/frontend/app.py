@@ -26,7 +26,7 @@ with gr.Blocks() as demo:
     gr.HTML("""
     <style>
     .container { max-width: 800px; margin: auto; padding: 20px; font-family: Arial, sans-serif; }
-    .chat-box { border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 20px; }
+    .chat-box { border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin-bottom: 20px; height: 400px; overflow-y: auto; }
     .chat-input { margin-top: 10px; margin-bottom: 20px; }
     .chat-message { padding: 10px; border-bottom: 1px solid #eee; }
     .chat-message:last-child { border-bottom: none; }
@@ -42,23 +42,24 @@ with gr.Blocks() as demo:
     </div>
     """)
     
-    chat_box = gr.Markdown(elem_id="chat-box")
+    chat_box = gr.HTML(value="<div id='chat-box-content'></div>", elem_id="chat-box")
     
     context_input = gr.Textbox(lines=5, placeholder="Enter the context here...", label="Context", elem_id="context")
     question_input = gr.Textbox(placeholder="Enter your question here...", label="Question", elem_id="question")
     submit_button = gr.Button("Send", elem_id="get-answer")
 
-    def update_chat(context, question):
+    def update_chat(context, question, current_chat):
         answer = answer_question(context, question)
-        chat_history = f"""
+        new_message = f"""
         <div class="chat-message">
             <div class="chat-question">Q: {question}</div>
             <div class="chat-answer">A: {answer}</div>
         </div>
         """
-        return gr.Markdown.update(value=chat_history, append=True)
+        updated_chat = current_chat + new_message
+        return updated_chat
     
-    submit_button.click(fn=update_chat, inputs=[context_input, question_input], outputs=chat_box)
+    submit_button.click(fn=update_chat, inputs=[context_input, question_input, chat_box], outputs=chat_box)
     
     gr.Examples(
         examples=examples,
