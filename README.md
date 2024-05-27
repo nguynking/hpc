@@ -1,11 +1,6 @@
 # hpc
 
-a simple text classification app using docker.
-
-> [!NOTE]
-> the app is in the most basic form to reduce the docker image size (for faster build and iteration), which contains the frontend and api, and I'm currently classifying the text by using a random function :)
->
->  we need to use huggingface and pytorch later for the final app.
+a multilingual extractive quesion answering system with XLM-RoBERTa using docker.
 
 # usage
 
