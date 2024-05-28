@@ -27,3 +27,5 @@ docker-compose up --build
 ```bash
 docker-compose up
 ```
+
+if you find that the `docker-compose build` command accumulates a lot of space on your computer's hard drive, you should use `docker system prune -a` to clean your filesystem.
